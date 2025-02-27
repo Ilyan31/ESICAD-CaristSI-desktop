@@ -11,7 +11,7 @@ import routing.Router
 import routing.Routes
 
 @Composable
-fun MainMenuScreen(router: Router) {
+fun MainMenuScreen(router: Router, onLogout: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -20,7 +20,7 @@ fun MainMenuScreen(router: Router) {
         Text("Menu Principal", style = MaterialTheme.typography.h4, modifier = Modifier.padding(16.dp))
 
         Button(
-            onClick = { println("Naviguer vers Gestion des Caristes") },
+            onClick = { router.navigateTo(Routes.GESTION_CARISTES) },
             modifier = Modifier.fillMaxWidth().padding(8.dp),
             shape = RoundedCornerShape(10.dp)
         ) {
@@ -28,7 +28,7 @@ fun MainMenuScreen(router: Router) {
         }
 
         Button(
-            onClick = { println("Naviguer vers Gestion des Colis") },
+            onClick = { router.navigateTo(Routes.GESTION_COLIS) },
             modifier = Modifier.fillMaxWidth().padding(8.dp),
             shape = RoundedCornerShape(10.dp)
         ) {
@@ -36,11 +36,22 @@ fun MainMenuScreen(router: Router) {
         }
 
         Button(
-            onClick = { println("Naviguer vers Gestion des Emplacements") },
+            onClick = { router.navigateTo(Routes.GESTION_EMPLACEMENTS) },
             modifier = Modifier.fillMaxWidth().padding(8.dp),
             shape = RoundedCornerShape(10.dp)
         ) {
             Text("Gestion des Emplacements")
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onLogout,
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Text("Déconnexion", color = MaterialTheme.colors.onPrimary)
         }
     }
 }

@@ -2,12 +2,14 @@ package routing
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 enum class Routes(val route: String) {
     LOGIN("LOGIN"),
-    HOME("HOME")
+    HOME("HOME"),
+    GESTION_CARISTES("GESTION_CARISTES"),
+    GESTION_COLIS("GESTION_COLIS"),
+    GESTION_EMPLACEMENTS("GESTION_EMPLACEMENTS")
 }
 
 class Router {

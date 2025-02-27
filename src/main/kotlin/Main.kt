@@ -11,33 +11,35 @@ import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import routing.Router
 import routing.Routes
-import ui.LoginScreen
-import ui.MainMenuScreen
+import ui.*
 
 @Composable
 @Preview
 fun App(database: Database) {
     val router = remember { Router() }
-    var isAuthenticated by remember { mutableStateOf(false) } // ✅ Correction
+    var isAuthenticated by remember { mutableStateOf(false) }
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
-            if (!isAuthenticated) {
-                LoginScreen { email, password ->
+            when {
+                !isAuthenticated -> LoginScreen { email, password ->
                     println("Tentative de connexion avec $email")
 
                     val userExists = database.from(Caristes)
                         .select()
                         .where { (Caristes.login eq email) and (Caristes.mdp eq password) }
-                        .totalRecords > 0 // ✅ Correction
+                        .totalRecords > 0
 
                     if (userExists) {
                         isAuthenticated = true
-                        router.navigateTo(Routes.HOME) // Naviguer vers le menu principal
+                        router.navigateTo(Routes.HOME)
                     }
                 }
-            } else {
-                MainMenuScreen(router) // Afficher directement le menu principal
+
+                router.currentRoute == Routes.HOME -> MainMenuScreen(router, onLogout = { isAuthenticated = false })
+                router.currentRoute == Routes.GESTION_CARISTES -> GestionCaristesScreen(router)
+                router.currentRoute == Routes.GESTION_COLIS -> GestionColisScreen(router)
+                router.currentRoute == Routes.GESTION_EMPLACEMENTS -> GestionEmplacementsScreen(router)
             }
         }
     }
