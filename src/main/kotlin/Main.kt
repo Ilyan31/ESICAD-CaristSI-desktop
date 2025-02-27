@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import database.DB
 import ktorm.Caristes
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
@@ -15,24 +16,26 @@ import ui.*
 
 @Composable
 @Preview
-fun App(database: Database) {
-    val router = remember { Router() }
+fun App(router: Router) {
     var isAuthenticated by remember { mutableStateOf(false) }
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             when {
                 !isAuthenticated -> LoginScreen { email, password ->
-                    println("Tentative de connexion avec $email")
+                    println("🔐 Tentative de connexion avec $email")
 
-                    val userExists = database.from(Caristes)
+                    val userExists = DB.database.from(Caristes)
                         .select()
                         .where { (Caristes.login eq email) and (Caristes.mdp eq password) }
                         .totalRecords > 0
 
                     if (userExists) {
+                        println("✅ Connexion réussie")
                         isAuthenticated = true
                         router.navigateTo(Routes.HOME)
+                    } else {
+                        println("❌ Échec de connexion")
                     }
                 }
 
@@ -46,13 +49,24 @@ fun App(database: Database) {
 }
 
 fun main() = application {
+    // 🔹 Connexion à la base de données
     val database = Database.connect(
         url = "jdbc:mysql://localhost:3306/carist-si",
         user = "root",
-        password = null
+        password = "",
+        driver = "com.mysql.cj.jdbc.Driver"
     )
 
+    // 🔹 Vérification des colis existants
+    val nombreColis = database.useConnection { conn ->
+        conn.prepareStatement("SELECT COUNT(*) FROM Colis").executeQuery().use { rs ->
+            if (rs.next()) rs.getInt(1) else 0
+        }
+    }
+
+    println("📦 Nombre de colis en base : $nombreColis")
+
     Window(onCloseRequest = ::exitApplication) {
-        App(database)
+        App(router = remember { Router() }) // ✅ Correction de l’appel de `App`
     }
 }
