@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,7 +30,26 @@ fun GestionCaristesScreen(router: Router) {
     var isEditing by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Gestion des Caristes", style = MaterialTheme.typography.h4, modifier = Modifier.padding(16.dp))
+
+        // 🔹 En-tête avec bouton retour
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Gestion des Caristes", style = MaterialTheme.typography.h4)
+
+            // 🔙 Bouton retour au menu principal en haut à droite
+            Button(
+                onClick = { router.navigateTo(Routes.HOME) },
+                modifier = Modifier.padding(8.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray)
+            ) {
+                Text("Retour", color = Color.White)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // 🔎 Barre de recherche
         TextField(
@@ -141,16 +161,6 @@ fun GestionCaristesScreen(router: Router) {
                     }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 🔙 Bouton retour au menu principal
-        Button(
-            onClick = { router.navigateTo(Routes.HOME) },
-            modifier = Modifier.fillMaxWidth().padding(8.dp)
-        ) {
-            Text("Retour au menu principal")
         }
     }
 }
