@@ -2,12 +2,13 @@ package repositories
 
 import database.DB
 import ktorm.Colis
+import ktorm.Emplacements
 import org.ktorm.dsl.*
 import java.time.LocalDate
 
 object ColisRepository {
 
-    // 🔹 Récupérer tous les colis
+    // 🔹 Récupérer tous les colis (sans infos sur l'emplacement)
     fun getAllColis(): List<Map<String, Any>> {
         return try {
             DB.database.from(Colis)
@@ -38,7 +39,71 @@ object ColisRepository {
         }
     }
 
-    // 🔹 Ajouter un colis
+    // 🔹 Récupérer tous les colis en affichant aussi le nom de l'emplacement
+    fun getAllColisWithEmplacement(): List<Map<String, Any>> {
+        return try {
+            DB.database.from(Colis)
+                // Jointure pour récupérer le nom de l'emplacement
+                .leftJoin(Emplacements, on = Colis.idEmplacement eq Emplacements.id)
+                .select()
+                .mapNotNull { row ->
+                    val id = row[Colis.id] ?: return@mapNotNull null
+                    val code = row[Colis.code] ?: return@mapNotNull null
+                    val description = row[Colis.description] ?: return@mapNotNull null
+                    val poids = row[Colis.poids] ?: return@mapNotNull null
+                    val volume = row[Colis.volume] ?: return@mapNotNull null
+                    val dateReception = row[Colis.dateReception]?.toString() ?: return@mapNotNull null
+                    val idEmp = row[Colis.idEmplacement] ?: return@mapNotNull null
+                    val nomEmp = row[Emplacements.nom] ?: "?"
+
+                    mapOf(
+                        "id" to id,
+                        "code" to code,
+                        "description" to description,
+                        "poids" to poids,
+                        "volume" to volume,
+                        "dateReception" to dateReception,
+                        "idEmplacement" to idEmp,
+                        "emplacementNom" to nomEmp
+                    )
+                }
+        } catch (e: Exception) {
+            println("⚠️ Erreur lors de la récupération des colis (avec emplacement) : ${e.localizedMessage}")
+            emptyList()
+        }
+    }
+
+    // 🔹 Récupérer les colis d'un emplacement spécifique
+    fun getColisByEmplacement(idEmplacement: Int): List<Map<String, Any>> {
+        return try {
+            DB.database.from(Colis)
+                .select()
+                .where { Colis.idEmplacement eq idEmplacement }
+                .mapNotNull { row ->
+                    val id = row[Colis.id] ?: return@mapNotNull null
+                    val code = row[Colis.code] ?: return@mapNotNull null
+                    val description = row[Colis.description] ?: return@mapNotNull null
+                    val poids = row[Colis.poids] ?: return@mapNotNull null
+                    val volume = row[Colis.volume] ?: return@mapNotNull null
+                    val dateReception = row[Colis.dateReception]?.toString() ?: return@mapNotNull null
+
+                    mapOf(
+                        "id" to id,
+                        "code" to code,
+                        "description" to description,
+                        "poids" to poids,
+                        "volume" to volume,
+                        "dateReception" to dateReception,
+                        "idEmplacement" to idEmplacement
+                    )
+                }
+        } catch (e: Exception) {
+            println("⚠️ Erreur lors de la récupération des colis par emplacement : ${e.localizedMessage}")
+            emptyList()
+        }
+    }
+
+    // 🔹 Ajouter un colis (logique existante)
     fun addColis(code: String, description: String, poids: Double, volume: Double, dateReception: String, idEmplacement: Int) {
         try {
             val parsedDateReception = LocalDate.parse(dateReception)
@@ -59,7 +124,7 @@ object ColisRepository {
         }
     }
 
-    // 🔹 Modifier un colis
+    // 🔹 Modifier un colis (logique existante)
     fun updateColis(id: Int, code: String, description: String, poids: Double, volume: Double, dateReception: String, idEmplacement: Int) {
         try {
             val parsedDateReception = LocalDate.parse(dateReception) // ✅ Utilisation correcte
@@ -80,7 +145,7 @@ object ColisRepository {
         }
     }
 
-    // 🔹 Supprimer un colis
+    // 🔹 Supprimer un colis (logique existante)
     fun deleteColis(id: Int) {
         try {
             val deletedRows = DB.database.delete(Colis) {
