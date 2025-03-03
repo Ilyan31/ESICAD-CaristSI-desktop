@@ -45,7 +45,7 @@ fun GestionCaristesScreen(router: Router) {
                 modifier = Modifier.padding(8.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray)
             ) {
-                Text("Retour", color = Color.White)
+                Text("⬅ Menu", color = Color.White)
             }
         }
 

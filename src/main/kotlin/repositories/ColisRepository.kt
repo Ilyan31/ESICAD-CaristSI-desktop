@@ -41,7 +41,7 @@ object ColisRepository {
     // 🔹 Ajouter un colis
     fun addColis(code: String, description: String, poids: Double, volume: Double, dateReception: String, idEmplacement: Int) {
         try {
-            val parsedDateReception = LocalDate.parse(dateReception) // ✅ Utilisation correcte
+            val parsedDateReception = LocalDate.parse(dateReception)
 
             DB.database.insert(Colis) {
                 set(Colis.code, code)
